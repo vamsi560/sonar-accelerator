@@ -1,0 +1,11 @@
+- Do not use any `any` type.
+- Do not skip null/undefined checks.
+- Do not hardcode URLs, tokens, or constants.
+- Do not use inline CSS unless specified.
+- Do not generate code without unit tests.
+- Do not include business logic inside UI layer.
+- Always use environment variables for configurations.
+- Always handle error and loading states.
+- Always follow accessibility and keyboard navigation.
+- Use `tailwind` CSS library
+- 

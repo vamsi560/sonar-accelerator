@@ -1,0 +1,8 @@
+1. "Generate a basic folder structure for a scalable React project with TypeScript and TailwindCSS."
+2. "Create a `.eslintrc.json` and `prettier.config.js` for code linting and formatting."
+3. "Initialize routing using `react-router-dom` with Home and About routes."
+4. "Set up Vite with TypeScript, including a dev server configuration with aliases like @components.."
+5. "Create a scalable folder structure using src/components, src/pages, etc."
+6. "Setup routing with react-router-dom, including lazy loading and 404 fallback."
+7. "Create a boilerplate project setup that supports component-based development and lazy-loaded routing."
+8. "Configure environment-specific .env files and describe how to load variables securely in React."

@@ -1,0 +1,5 @@
+1. "Generate a design token system using TailwindCSS for colors, spacing, and typography."
+2. "Implement a theme switcher with persistence."
+3. "Implement utility-first CSS classes that follow a BEM-like convention with Tailwind."
+4. "Create responsive UI primitives like Button, Input, Card, and List using design tokens."
+5. "Suggest a way to enforce consistency using PropTypes or TypeScript interfaces."

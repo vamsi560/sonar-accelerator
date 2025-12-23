@@ -1,0 +1,8 @@
+- Use type script
+- Use the common components that are defined in application folder
+- Semantic and accessible HTML structure (using ARIA if necessary)
+- Modular and reusable component design
+- UI and UX consistency
+- UX to Converted react code should match pixel perfect.
+- Component should be tested-ready (consider structure that works well with Jest or RTL)
+- Avoid inline styles unless necessary and prefer tailwind css utility classes
