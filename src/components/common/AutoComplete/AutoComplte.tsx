@@ -143,7 +143,13 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
             aria-required={ariaProps['aria-required'] ?? required}
             aria-autocomplete="list"
             autoComplete="off"
+            list={`${id || 'autocomplete'}-datalist`}
           />
+          <datalist id={`${id || 'autocomplete'}-datalist`}>
+            {filteredOptions.map((option) => (
+              <option key={String(option)} value={String(option)} />
+            ))}
+          </datalist>
 
           {/* Clear button */}
           {inputValue && !disableClearable && !disabled && (
@@ -160,21 +166,30 @@ const AutoComplete = React.forwardRef<HTMLInputElement, AutoCompleteProps>(
 
         {/* Dropdown options */}
         {isOpen && filteredOptions.length > 0 && (
-          <ul
-            className="absolute z-10 w-full mt-1 border border-gray-300 rounded-md bg-white shadow-lg max-h-60 overflow-y-auto"
-            role="listbox"
+          <select
+            value={inputValue}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              const selectedOption = filteredOptions.find(
+                (option) => String(option) === selectedValue
+              );
+              if (selectedOption) {
+                handleOptionSelect(selectedOption);
+              }
+            }}
+            className="absolute z-10 w-full mt-1 border border-gray-300 rounded-md bg-white shadow-lg"
           >
-            {filteredOptions.map((option, index) => (
-              <li
-                key={index}
-                onClick={() => handleOptionSelect(option)}
-                className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm"
-                role="option"
+            <option value="">Select an option</option>
+            {filteredOptions.map((option) => (
+              <option 
+                key={String(option)} 
+                value={String(option)}
+                aria-selected={inputValue === String(option)}
               >
                 {String(option)}
-              </li>
+              </option>
             ))}
-          </ul>
+          </select>
         )}
 
         {/* No results message */}

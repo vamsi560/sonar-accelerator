@@ -28,7 +28,7 @@ export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   ariaLabelledby?: string;
   ariaDescribedby?: string;
   ariaHidden?: boolean;
-  ariaLive?: 'off' | 'polite' | 'assertive' | undefined;
+  ariaLive?: 'off' | 'polite' | 'assertive';
 }
 
 

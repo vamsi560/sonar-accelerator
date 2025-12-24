@@ -76,7 +76,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     const [uncontrolledChecked, setUncontrolledChecked] = useState(defaultChecked || false);
 
     // Support both controlled and uncontrolled modes
-    const isChecked = checked !== undefined ? checked : uncontrolledChecked;
+    const isChecked = checked ?? uncontrolledChecked;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (checked === undefined) {
@@ -98,6 +98,13 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     };
 
     const checkboxId = id || 'checkbox';
+
+    // Determine background color based on checked state and variant
+    const bgColorClass = isChecked 
+      ? 'bg-blue-500 border-blue-500' 
+      : variant === 'filled' 
+        ? '' 
+        : 'bg-white';
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>
@@ -131,9 +138,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         {/* Custom checkbox display */}
         <label
           htmlFor={checkboxId}
-          className={`${sizeClasses[size]} rounded transition-all cursor-pointer flex items-center justify-center ${variantClasses[variant]} ${
-            isChecked ? 'bg-blue-500 border-blue-500' : variant === 'filled' ? '' : 'bg-white'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`${sizeClasses[size]} rounded transition-all cursor-pointer flex items-center justify-center ${variantClasses[variant]} ${bgColorClass} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {isChecked && (
             <svg

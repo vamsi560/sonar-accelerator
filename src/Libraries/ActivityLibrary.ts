@@ -1,5 +1,9 @@
-// Import tracking utilities from react-tracking
-import track, { useTracking } from "react-tracking";
+// Mock implementation of useTracking since react-tracking is incompatible with React 19
+const useTracking = () => ({
+    trackEvent: (data: unknown) => {
+        console.log('Activity tracked:', data);
+    }
+});
 
 /**
  * Tracks an activity event for a given component and event type.
@@ -13,13 +17,11 @@ function AddActivity(funComp: string, funEvent: string): Record<string, never> {
      * Triggers the tracking event with the provided component and event details.
      */
     const { trackEvent } = useTracking();
-    const trackAddClaim = (): void => {
-        trackEvent({
-            funComponent: funComp, // Component name or identifier
-            event: funEvent,       // Event name or type
-            activity_time: new Date() // Timestamp of the activity
-        });
-    };
+    trackEvent({
+        funComponent: funComp, // Component name or identifier
+        event: funEvent,       // Event name or type
+        activity_time: new Date() // Timestamp of the activity
+    });
     // Currently returns an empty object; can be extended for more features
     return {};
 }

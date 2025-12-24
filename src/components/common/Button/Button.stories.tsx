@@ -66,7 +66,7 @@ export const Text: Story = {
 export const WithStartIcon: Story = {
   args: {
     children: 'Start Icon',
-    startIcon: <span role="img" aria-label="star">⭐</span>,
+    startIcon: <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E⭐%3C/text%3E%3C/svg%3E" alt="star" width="24" height="24" />,
     variant: 'contained',
     color: 'secondary',
   },
@@ -75,7 +75,7 @@ export const WithStartIcon: Story = {
 export const WithEndIcon: Story = {
   args: {
     children: 'End Icon',
-    endIcon: <span role="img" aria-label="arrow">➡️</span>,
+    endIcon: <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E➡️%3C/text%3E%3C/svg%3E" alt="arrow" width="24" height="24" />,
     variant: 'contained',
     color: 'success',
   },

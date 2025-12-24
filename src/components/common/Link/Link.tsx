@@ -58,6 +58,7 @@ const Link: React.FC<LinkProps> = ({
     fontSize: `var(--font-size-${size})`,
   };
 
+  // Determine text decoration based on underline prop
   const underlineStyle =
     underline === "always"
       ? { textDecoration: "underline" }

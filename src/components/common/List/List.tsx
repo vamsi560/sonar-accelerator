@@ -15,7 +15,6 @@ export interface ListProps {
   'aria-describedby'?: string;
   'aria-controls'?: string;
   'aria-live'?: 'off' | 'polite' | 'assertive';
-  'aria-orientation'?: 'horizontal' | 'vertical';
   children?: React.ReactNode;
 }
 
@@ -29,27 +28,23 @@ const List = forwardRef<HTMLUListElement, ListProps>((props, ref) => {
     'aria-describedby': ariaDescribedby,
     'aria-controls': ariaControls,
     'aria-live': ariaLive = 'off',
-    'aria-orientation': ariaOrientation = 'vertical',
     children,
   } = props;
 
   const innerRef = useRef<HTMLUListElement | null>(null);
   useImperativeHandle<HTMLUListElement | null, HTMLUListElement | null>(ref, () => innerRef.current);
 
-  const flexDirection = ariaOrientation === 'horizontal' ? 'flex-row' : 'flex-col';
-
   return (
     <ul
       ref={innerRef}
       id={id}
-      className={`list-none p-0 m-0 flex ${flexDirection} gap-[var(--gap-xsmall)] bg-[var(--color-white)] rounded border border-[var(--color-divider)] ${className}`}
+      className={`list-none p-0 m-0 flex flex-col gap-[var(--gap-xsmall)] bg-[var(--color-white)] rounded border border-[var(--color-divider)] ${className}`}
       title={tooltip}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledby}
       aria-describedby={ariaDescribedby}
       aria-controls={ariaControls}
       aria-live={ariaLive}
-      aria-orientation={ariaOrientation}
     >
       {children}
     </ul>

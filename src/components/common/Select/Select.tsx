@@ -99,8 +99,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>((props, ref) => {
         ref={innerRef}
         id={id}
         name={name}
-        {...(value !== undefined ? { value } : {})}
-        {...(value === undefined && defaultValue !== undefined ? { defaultValue } : {})}
+        {...(value === undefined ? {} : { value })}
+        {...(value !== undefined ? {} : defaultValue !== undefined ? { defaultValue } : {})}
         required={required}
         disabled={disabled}
         title={title}

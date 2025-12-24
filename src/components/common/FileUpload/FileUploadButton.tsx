@@ -32,6 +32,7 @@ const FileUploadButton: React.FC<Props> = ({
 }) => {
   const base = 'inline-flex items-center gap-2 rounded-md font-medium focus:outline-none';
 
+  // Determine variant-specific classes based on button variant
   const variantClasses =
     variant === 'contained'
       ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'

@@ -152,44 +152,57 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
   return (
     <div className="inline-flex">
-      <svg
-        id={id}
-        width={numericSize}
-        height={numericSize}
-        className={className}
-        style={style}
-        role="progressbar"
-        aria-valuenow={ariaValueNow ?? (variant === 'determinate' ? value : undefined)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuetext={ariaValueText}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledby}
-        viewBox={`0 0 ${numericSize} ${numericSize}`}
-      >
-        {/* Background circle using secondary-light token */}
-        <circle
-          cx={numericSize / 2}
-          cy={numericSize / 2}
-          r={radius}
-          fill="none"
-          stroke="var(--color-secondary-light)"
-          strokeWidth={thickness}
+      {variant === 'determinate' ? (
+        <progress
+          id={id}
+          value={value}
+          max={100}
+          className={className}
+          style={style}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledby}
+          aria-valuetext={ariaValueText}
         />
+      ) : (
+        <svg
+          id={id}
+          width={numericSize}
+          height={numericSize}
+          className={className}
+          style={style}
+          role="progressbar"
+          aria-valuenow={ariaValueNow}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuetext={ariaValueText}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledby}
+          viewBox={`0 0 ${numericSize} ${numericSize}`}
+        >
+          {/* Background circle using secondary-light token */}
+          <circle
+            cx={numericSize / 2}
+            cy={numericSize / 2}
+            r={radius}
+            fill="none"
+            stroke="var(--color-secondary-light)"
+            strokeWidth={thickness}
+          />
 
-        {/* Progress circle with color token and animation */}
-        <circle
-          cx={numericSize / 2}
-          cy={numericSize / 2}
-          r={radius}
-          fill="none"
-          strokeWidth={thickness}
-          className={`${colorMap[color]} ${variant === 'indeterminate' ? 'animate-spin' : ''}`}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-        />
-      </svg>
+          {/* Progress circle with color token and animation */}
+          <circle
+            cx={numericSize / 2}
+            cy={numericSize / 2}
+            r={radius}
+            fill="none"
+            strokeWidth={thickness}
+            className={`${colorMap[color]} ${variant === 'indeterminate' ? 'animate-spin' : ''}`}
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
     </div>
   );
 };

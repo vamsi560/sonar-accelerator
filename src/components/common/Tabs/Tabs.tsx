@@ -178,7 +178,7 @@ const Tabs = ({
   const generatedId = useId();
   const rootId = id ?? `tabs-${generatedId}`;
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue);
-  const value = controlledValue !== undefined ? controlledValue : internalValue;
+  const value = controlledValue ?? internalValue;
   const isVertical = (ariaOrientation ?? (variant.includes("vertical") ? "vertical" : "horizontal")) === "vertical";
   const orientation = isVertical ? "vertical" : "horizontal";
 
@@ -224,8 +224,8 @@ const Tabs = ({
   useLayoutEffect(() => {
     const entries = tabsListRef.current;
     const entry = entries.find((e) => e.value === value);
-    if (entry && entry.el && containerRef.current) {
-      const elRect = entry.el.getBoundingClientRect();
+    if (entry?.el && containerRef.current) {
+      const elRect = entry?.el.getBoundingClientRect();
       const containerRect = containerRef.current.getBoundingClientRect();
       if (orientation === "horizontal") {
         setIndicator({
@@ -255,8 +255,8 @@ const Tabs = ({
     // recompute on window resize
     const handleResize = () => {
       const e = tabsListRef.current.find((e) => e.value === value);
-      if (e && e.el && containerRef.current) {
-        const elRect = e.el.getBoundingClientRect();
+      if (e?.el && containerRef.current) {
+        const elRect = e?.el.getBoundingClientRect();
         const containerRect = containerRef.current.getBoundingClientRect();
         if (orientation === "horizontal") {
           setIndicator({
@@ -413,33 +413,9 @@ const Tab = ({
       if (el) el.focus();
     };
 
-    if (orientation === "horizontal") {
-      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        focusIndex(currentIndex - 1);
-      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        focusIndex(currentIndex + 1);
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        focusIndex(0);
-      } else if (e.key === "End") {
-        e.preventDefault();
-        focusIndex(entries.length - 1);
-      } else if (e.key === "Enter" || e.key === " ") {
-        // Space or Enter activates the tab
-        e.preventDefault();
-        onChange(value);
-      }
-    } else {
-      // vertical navigation: up/down
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        focusIndex(currentIndex - 1);
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        focusIndex(currentIndex + 1);
-      } else if (e.key === "Home") {
+    // Handle key down for both horizontal and vertical navigation
+    const handleKeyNavigation = () => {
+      if (e.key === "Home") {
         e.preventDefault();
         focusIndex(0);
       } else if (e.key === "End") {
@@ -448,8 +424,27 @@ const Tab = ({
       } else if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         onChange(value);
+      } else if (orientation === "horizontal") {
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          e.preventDefault();
+          focusIndex(currentIndex - 1);
+        } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+          e.preventDefault();
+          focusIndex(currentIndex + 1);
+        }
+      } else {
+        // vertical navigation: up/down
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          focusIndex(currentIndex - 1);
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          focusIndex(currentIndex + 1);
+        }
       }
-    }
+    };
+
+    handleKeyNavigation();
   };
 
   const baseClasses = `inline-flex items-center gap-2 font-medium transition-colors duration-200 focus:outline-none focus:ring-0 focus:ring-[var(--color-primary)] focus:ring-offset-2 ${sizeClasses[size].tab} ${variantTabClasses[variant]}`;

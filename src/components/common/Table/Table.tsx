@@ -52,6 +52,11 @@ const Table = <T extends Record<string, unknown>>({
   size = 'medium',
   variant = 'standard',
 
+  ariaLabel,
+  ariaLabelledby,
+  ariaDescribedby,
+  ariaLive,
+
   columns = [],
   rows = [],
 
@@ -87,8 +92,11 @@ const Table = <T extends Record<string, unknown>>({
       if (av == null) return -1 * order;
       if (bv == null) return 1 * order;
       if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * order;
-
-      return String(av).localeCompare(String(bv)) * order;
+      if (typeof av === 'boolean' && typeof bv === 'boolean') return (av === bv ? 0 : av ? 1 : -1) * order;
+      
+      const avStr = typeof av === 'string' ? av : typeof av === 'object' ? JSON.stringify(av) : String(av);
+      const bvStr = typeof bv === 'string' ? bv : typeof bv === 'object' ? JSON.stringify(bv) : String(bv);
+      return avStr.localeCompare(bvStr) * order;
     });
   }, [rows, sortState]);
 
@@ -106,23 +114,31 @@ const Table = <T extends Record<string, unknown>>({
       id={id}
       className={`w-full overflow-x-auto ${className}`}
     >
-      <table className={`min-w-full text-left border-collapse ${tableVariantClasses[variant]} ${dense ? 'text-sm' : ''}`}>
+      <table 
+        className={`min-w-full text-left border-collapse ${tableVariantClasses[variant]} ${dense ? 'text-sm' : ''}`}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
+        aria-describedby={ariaDescribedby}
+        aria-live={ariaLive}
+      >
         <thead className={`${stickyHeader ? 'sticky top-0 z-10' : ''}`}>
           <tr>
-            {columns.filter((c) => !c.hide).map((col) => (
+            {columns.filter((c) => !c.hide).map((col) => {
+              const isCurrentSortField = sortState.field === String(col.field);
+              const ariaSort = isCurrentSortField
+                ? sortState.order === 'asc'
+                  ? 'ascending'
+                  : 'descending'
+                : undefined;
+
+              return (
               <th
                 key={col.id ?? String(col.field)}
                 style={{ width: col.width }}
                 className={`px-3 ${headerClasses} ${col.className ?? ''} ${
                   col.align === 'center' ? 'text-center' : ''
                 } ${col.align === 'right' ? 'text-right' : ''}`}
-                aria-sort={
-                  sortState.field === String(col.field)
-                    ? sortState.order === 'asc'
-                      ? 'ascending'
-                      : 'descending'
-                    : undefined
-                }
+                aria-sort={ariaSort}
               >
                 <div className="flex items-center gap-2">
                   <span>{col.headerName ?? String(col.field)}</span>
@@ -152,17 +168,24 @@ const Table = <T extends Record<string, unknown>>({
                   )}
                 </div>
               </th>
-            ))}
+              );
+            })}
           </tr>
         </thead>
 
         <tbody>
-          {sortedRows.map((row: T, rowIndex: number) => (
+          {sortedRows.map((row: T, rowIndex: number) => {
+            const rowKey = `row-${Object.values(row).join('-')}`;
+            const stripedClass = variant === 'striped'
+              ? rowIndex % 2 === 0
+                ? 'bg-white'
+                : 'bg-(--color-primary-light)'
+              : '';
+            
+            return (
             <tr
-              key={rowIndex}
-              className={`hover:bg-(--color-primary-light) ${
-                variant === 'striped' ? (rowIndex % 2 === 0 ? 'bg-white' : 'bg-(--color-primary-light)') : ''
-              } cursor-pointer`}
+              key={rowKey}
+              className={`hover:bg-(--color-primary-light) ${stripedClass} cursor-pointer`}
               onClick={() => onRowClick?.(row)}
             >
               {columns
@@ -180,7 +203,8 @@ const Table = <T extends Record<string, unknown>>({
                   </td>
                 ))}
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
