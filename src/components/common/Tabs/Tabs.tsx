@@ -25,6 +25,8 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
+  useMemo,
+  useCallback,
   type ReactNode,
   useId,
 } from "react";
@@ -191,17 +193,17 @@ const Tabs = ({
   // container ref to compute offsets
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const handleChange = (newValue: string | number) => {
+  const handleChange = useCallback((newValue: string | number) => {
     if (!disabled) {
       if (controlledValue === undefined) {
         setInternalValue(newValue);
       }
       if (onChange) onChange(newValue);
     }
-  };
+  }, [disabled, controlledValue, onChange]);
 
   // register / unregister tabs (keeps DOM order)
-  const registerTab = (tabValue: string | number, el: HTMLButtonElement | null, tabId?: string) => {
+  const registerTab = useCallback((tabValue: string | number, el: HTMLButtonElement | null, tabId?: string) => {
     // If el is null, ensure it's removed.
     tabsListRef.current = tabsListRef.current.filter((r) => r.value !== tabValue);
     if (el) {
@@ -210,15 +212,15 @@ const Tabs = ({
     }
     // update indicator after registration
     // do in layout effect via effect triggered by value change below
-  };
+  }, []);
 
-  const unregisterTab = (tabValue: string | number) => {
+  const unregisterTab = useCallback((tabValue: string | number) => {
     tabsListRef.current = tabsListRef.current.filter((r) => r.value !== tabValue);
-  };
+  }, []);
 
-  const getTabIndex = (tabValue: string | number) => {
+  const getTabIndex = useCallback((tabValue: string | number) => {
     return tabsListRef.current.findIndex((r) => r.value === tabValue);
-  };
+  }, []);
 
   // compute indicator when value or tabs list changes or on resize
   useLayoutEffect(() => {
@@ -280,19 +282,22 @@ const Tabs = ({
     return () => window.removeEventListener("resize", handleResize);
   }, [value, children, variant, orientation]);
 
-  // Provider value
-  const providerValue: TabsContextType = {
-    value,
-    onChange: handleChange,
-    variant,
-    size,
-    disabled,
-    orientation,
-    registerTab,
-    unregisterTab,
-    getTabIndex,
-    tabsListRef,
-  };
+  // Provider value - memoized to prevent unnecessary re-renders of consuming components
+  const providerValue: TabsContextType = useMemo(
+    () => ({
+      value,
+      onChange: handleChange,
+      variant,
+      size,
+      disabled,
+      orientation,
+      registerTab,
+      unregisterTab,
+      getTabIndex,
+      tabsListRef,
+    }),
+    [value, handleChange, variant, size, disabled, orientation, registerTab, unregisterTab, getTabIndex, tabsListRef]
+  );
 
   // outer container class
   const containerClasses = `${variantContainerClasses[variant]} ${className}`;
@@ -432,7 +437,7 @@ const Tab = ({
           e.preventDefault();
           focusIndex(currentIndex + 1);
         }
-      } else {
+      } else if (orientation === "vertical") {
         // vertical navigation: up/down
         if (e.key === "ArrowUp") {
           e.preventDefault();

@@ -100,11 +100,14 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
     const checkboxId = id || 'checkbox';
 
     // Determine background color based on checked state and variant
-    const bgColorClass = isChecked 
-      ? 'bg-blue-500 border-blue-500' 
-      : variant === 'filled' 
-        ? '' 
-        : 'bg-white';
+    const getBackgroundColor = () => {
+      if (isChecked) {
+        return 'bg-blue-500 border-blue-500';
+      }
+      return variant === 'filled' ? '' : 'bg-white';
+    };
+    
+    const bgColorClass = getBackgroundColor();
 
     return (
       <div className={`flex items-center gap-2 ${className}`}>

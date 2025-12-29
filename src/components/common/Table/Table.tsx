@@ -78,8 +78,37 @@ const Table = <T extends Record<string, unknown>>({
     );
   };
 
+  const baseRowClass = `${sizeMap[size]} ${dense ? 'py-1' : ''}`;
+  const headerClasses = `${sizeMap[size]} font-semibold bg-[var(--color-primary-light)] text-[var(--color-black)]`;
+
   const sortedRows = useMemo(() => {
     if (!sortState.field) return rows;
+
+    // Helper function to convert value to string for comparison
+    const valueToString = (val: unknown): string => {
+      if (typeof val === 'string') return val;
+      if (typeof val === 'object') return JSON.stringify(val);
+      return String(val);
+    };
+
+    // Helper function to compare two values
+    const compareValues = (av: unknown, bv: unknown, order: number): number => {
+      if (av === bv) return 0;
+      if (av == null) return -1 * order;
+      if (bv == null) return 1 * order;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * order;
+      if (typeof av === 'boolean' && typeof bv === 'boolean') {
+        const getBooleanComparison = (): number => {
+          if (av === bv) return 0;
+          return av ? 1 : -1;
+        };
+        return getBooleanComparison() * order;
+      }
+      if (typeof av === 'object' || typeof bv === 'object') {
+        return valueToString(av).localeCompare(valueToString(bv)) * order;
+      }
+      return String(av).localeCompare(String(bv)) * order;
+    };
 
     const field = sortState.field;
     const order = sortState.order === 'desc' ? -1 : 1;
@@ -87,21 +116,9 @@ const Table = <T extends Record<string, unknown>>({
     return [...rows].sort((a, b) => {
       const av = a[field];
       const bv = b[field];
-
-      if (av === bv) return 0;
-      if (av == null) return -1 * order;
-      if (bv == null) return 1 * order;
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * order;
-      if (typeof av === 'boolean' && typeof bv === 'boolean') return (av === bv ? 0 : av ? 1 : -1) * order;
-      
-      const avStr = typeof av === 'string' ? av : typeof av === 'object' ? JSON.stringify(av) : String(av);
-      const bvStr = typeof bv === 'string' ? bv : typeof bv === 'object' ? JSON.stringify(bv) : String(bv);
-      return avStr.localeCompare(bvStr) * order;
+      return compareValues(av, bv, order);
     });
   }, [rows, sortState]);
-
-  const baseRowClass = `${sizeMap[size]} ${dense ? 'py-1' : ''}`;
-  const headerClasses = `${sizeMap[size]} font-semibold bg-[var(--color-primary-light)] text-[var(--color-black)]`;
 
   const tableVariantClasses = {
     standard: '',
@@ -176,11 +193,15 @@ const Table = <T extends Record<string, unknown>>({
         <tbody>
           {sortedRows.map((row: T, rowIndex: number) => {
             const rowKey = `row-${Object.values(row).join('-')}`;
-            const stripedClass = variant === 'striped'
-              ? rowIndex % 2 === 0
-                ? 'bg-white'
-                : 'bg-(--color-primary-light)'
-              : '';
+            
+            const getStripedClass = (): string => {
+              if (variant !== 'striped') {
+                return '';
+              }
+              return rowIndex % 2 === 0 ? 'bg-white' : 'bg-(--color-primary-light)';
+            };
+            
+            const stripedClass = getStripedClass();
             
             return (
             <tr

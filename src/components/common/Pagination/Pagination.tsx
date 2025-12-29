@@ -63,12 +63,17 @@ const Pagination: React.FC<PaginationProps> = ({
     ? 'text-[var(--color-primary)] font-semibold'
     : 'text-gray-700';
 
-  const variantClasses =
-    variant === 'contained'
-      ? containedClasses
-      : variant === 'outlined'
-      ? outlinedClasses
-      : textClasses;
+  const getVariantClasses = (): string => {
+    if (variant === 'contained') {
+      return containedClasses;
+    }
+    if (variant === 'outlined') {
+      return outlinedClasses;
+    }
+    return textClasses;
+  };
+
+  const variantClasses = getVariantClasses();
 
   const ariaCurrent = selected ? 'page' : undefined;
 

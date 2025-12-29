@@ -90,7 +90,7 @@ const validateFieldRules = (item: Record<string, unknown>, validationRules: Reco
         const ruleFn = validationRulesMethod[rule as keyof typeof validationRulesMethod];
         if (!ruleFn) continue;
         
-        const ruleValue = validationRules[rule].value as unknown;
+        const ruleValue = validationRules[rule].value;
         const ruleErrorMessage = validationRules[rule].errorMessage as string | undefined;
         
         // Call the validation function with appropriate parameters

@@ -70,10 +70,7 @@ export function getCookie<T = unknown>(key: string): T | null {
     const decodedCookie = decodeURIComponent(document.cookie);
     const cookieArray = decodedCookie.split(';');
     for (const cookieItem of cookieArray) {
-        let cookie = cookieItem;
-        while (cookie.charAt(0) === ' ') {
-            cookie = cookie.substring(1);
-        }
+        const cookie = cookieItem.trim();
         if (cookie.startsWith(name)) {
             const value = cookie.substring(name.length);
             return JSON.parse(decodeURIComponent(value));

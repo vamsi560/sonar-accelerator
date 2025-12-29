@@ -55,7 +55,7 @@ const Tooltip: React.FC<TooltipProps> = ({
     leaveTimer.current = globalThis.setTimeout(() => setOpen(false), leaveDelay);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleTooltipKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       hide();
     }
@@ -81,17 +81,18 @@ const Tooltip: React.FC<TooltipProps> = ({
   const childAriaDescribedBy = ariaDescribedby || (open ? tooltipId : undefined);
 
   return (
-    <div
+    <button
       className={`relative inline-flex ${className}`}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}
-      onKeyDown={handleKeyDown}
-      role="group"
-      aria-label={ariaLabel}
+      onKeyDown={handleTooltipKeyDown}
+      aria-label={ariaLabel || "Tooltip trigger"}
       aria-labelledby={ariaLabelledby}
       aria-describedby={open ? ariaDescribedby || tooltipId : ariaDescribedby}
+      aria-expanded={open}
+      type="button"
     >
       {React.isValidElement(children)
         ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
@@ -133,7 +134,7 @@ const Tooltip: React.FC<TooltipProps> = ({
           />
         </span>
       )}
-    </div>
+    </button>
   );
 };
 

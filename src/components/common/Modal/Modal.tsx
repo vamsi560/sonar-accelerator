@@ -33,7 +33,6 @@ export interface ModalProps {
   className?: string;
   title?: React.ReactNode;
   slots?: Record<string, React.ReactNode>;
-  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   /** max width of the modal content (CSS value, e.g. '600px' or '90vw') */
   maxWidth?: string;
   /** max height of the modal content (CSS value, e.g. '80vh') */
@@ -67,7 +66,6 @@ const Modal: React.FC<ModalProps> = ({
   className = '',
   title,
   slots,
-  onClick,
   maxWidth,
   maxHeight,
   'aria-label': ariaLabel,
@@ -101,6 +99,12 @@ const Modal: React.FC<ModalProps> = ({
   const backdropClassName = "absolute inset-0 bg-[var(--color-backdrop)] " + (BackdropProps?.className ?? '');
   const dialogClassName = "relative z-10 w-full max-w-lg p-[var(--padding-medium)] bg-[var(--color-white)] shadow-lg outline-none " + className;
 
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (e.key === 'Escape' && !disableEscapeKeyDown) {
+      onClose?.(undefined);
+    }
+  };
+
   return (
     <div id={id} className={`fixed inset-0 z-50 flex items-center justify-center`}>
       {!hideBackdrop && (
@@ -114,13 +118,15 @@ const Modal: React.FC<ModalProps> = ({
       )}
       <dialog
         ref={containerRef}
+        role="dialog"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledby}
         aria-describedby={ariaDescribedby}
         aria-controls={ariaControls}
         aria-modal={ariaModal}
         aria-live={ariaLive}
-        onClick={(e) => onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>)}
+        tabIndex={-1}
+        onKeyDown={handleDialogKeyDown}
         className={dialogClassName}
         data-max-width={maxWidth}
         data-max-height={maxHeight}

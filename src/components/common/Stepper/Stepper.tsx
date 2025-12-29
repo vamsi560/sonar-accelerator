@@ -405,7 +405,17 @@ const Stepper: React.FC<StepperProps> = ({
     const completedStatusClass = `bg-[var(--color-success)] text-white border-[var(--color-success)]`;
     const defaultStatusClass = `bg-white border-[var(--color-secondary-light)] ${colorMap[color]}`;
     
-    const statusClass = isActive ? activeStatusClass : isCompleted ? completedStatusClass : defaultStatusClass;
+    const getStatusClass = (): string => {
+      if (isActive) {
+        return activeStatusClass;
+      }
+      if (isCompleted) {
+        return completedStatusClass;
+      }
+      return defaultStatusClass;
+    };
+
+    const statusClass = getStatusClass();
     
     const interactionClass = isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md';
     return `${baseClass} ${statusClass} ${interactionClass} ${sizeMap[size].icon}`;
@@ -442,7 +452,7 @@ const Stepper: React.FC<StepperProps> = ({
         const isDisabled = disabled || stepData.disabled;
         const canNavigate =
           type === 'non-linear' || stepIndex <= currentStep || (isCompleted && stepIndex === currentStep + 1);
-        const stepKey = `step-${typeof stepData.label === 'string' ? stepData.label.toLowerCase().replace(/\s+/g, '-') : stepIndex}`;
+        const stepKey = `step-${typeof stepData.label === 'string' ? stepData.label.toLowerCase().replaceAll(/\s+/g, '-') : stepIndex}`;
         const stepLabel = typeof stepData.label === 'string' ? stepData.label : `Step ${stepIndex + 1}`;
         const stepAriaLabel = ariaLabel || stepLabel;
 

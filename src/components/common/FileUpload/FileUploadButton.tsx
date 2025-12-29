@@ -33,12 +33,17 @@ const FileUploadButton: React.FC<Props> = ({
   const base = 'inline-flex items-center gap-2 rounded-md font-medium focus:outline-none';
 
   // Determine variant-specific classes based on button variant
-  const variantClasses =
-    variant === 'contained'
-      ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]'
-      : variant === 'outlined'
-      ? 'border border-[var(--color-primary)] text-[var(--color-primary)] bg-white hover:bg-[var(--color-primary-light)]'
-      : 'bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-primary-light)]';
+  const getVariantClasses = () => {
+    if (variant === 'contained') {
+      return 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)]';
+    }
+    if (variant === 'outlined') {
+      return 'border border-[var(--color-primary)] text-[var(--color-primary)] bg-white hover:bg-[var(--color-primary-light)]';
+    }
+    return 'bg-transparent text-[var(--color-primary)] hover:bg-[var(--color-primary-light)]';
+  };
+
+  const variantClasses = getVariantClasses();
 
   const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer';
 
