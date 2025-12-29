@@ -107,7 +107,7 @@ const Table = <T extends Record<string, unknown>>({
       if (typeof av === 'object' || typeof bv === 'object') {
         return valueToString(av).localeCompare(valueToString(bv)) * order;
       }
-      return String(av).localeCompare(String(bv)) * order;
+      return valueToString(av).localeCompare(valueToString(bv)) * order;
     };
 
     const field = sortState.field;
@@ -142,11 +142,12 @@ const Table = <T extends Record<string, unknown>>({
           <tr>
             {columns.filter((c) => !c.hide).map((col) => {
               const isCurrentSortField = sortState.field === String(col.field);
-              const ariaSort = isCurrentSortField
-                ? sortState.order === 'asc'
-                  ? 'ascending'
-                  : 'descending'
-                : undefined;
+              let ariaSort: 'ascending' | 'descending' | undefined;
+              if (isCurrentSortField) {
+                ariaSort = sortState.order === 'asc' ? 'ascending' : 'descending';
+              } else {
+                ariaSort = undefined;
+              }
 
               return (
               <th
@@ -192,7 +193,9 @@ const Table = <T extends Record<string, unknown>>({
 
         <tbody>
           {sortedRows.map((row: T, rowIndex: number) => {
-            const rowKey = `row-${Object.values(row).join('-')}`;
+            const rowKey = `row-${Object.values(row).map(val => 
+              typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val)
+            ).join('-')}`;
             
             const getStripedClass = (): string => {
               if (variant !== 'striped') {

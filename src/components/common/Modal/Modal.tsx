@@ -113,12 +113,10 @@ const Modal: React.FC<ModalProps> = ({
           aria-label="close modal"
           onClick={() => onClose?.(undefined)}
           className={backdropClassName}
-          style={{ border: 'none', padding: 0, cursor: 'pointer' }}
         />
       )}
       <dialog
         ref={containerRef}
-        role="dialog"
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledby}
         aria-describedby={ariaDescribedby}
