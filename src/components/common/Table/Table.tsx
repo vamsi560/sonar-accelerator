@@ -52,11 +52,6 @@ const Table = <T extends Record<string, unknown>>({
   size = 'medium',
   variant = 'standard',
 
-  ariaLabel,
-  ariaLabelledby,
-  ariaDescribedby,
-  ariaLive,
-
   columns = [],
   rows = [],
 
@@ -78,37 +73,8 @@ const Table = <T extends Record<string, unknown>>({
     );
   };
 
-  const baseRowClass = `${sizeMap[size]} ${dense ? 'py-1' : ''}`;
-  const headerClasses = `${sizeMap[size]} font-semibold bg-[var(--color-primary-light)] text-[var(--color-black)]`;
-
   const sortedRows = useMemo(() => {
     if (!sortState.field) return rows;
-
-    // Helper function to convert value to string for comparison
-    const valueToString = (val: unknown): string => {
-      if (typeof val === 'string') return val;
-      if (typeof val === 'object') return JSON.stringify(val);
-      return String(val);
-    };
-
-    // Helper function to compare two values
-    const compareValues = (av: unknown, bv: unknown, order: number): number => {
-      if (av === bv) return 0;
-      if (av == null) return -1 * order;
-      if (bv == null) return 1 * order;
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * order;
-      if (typeof av === 'boolean' && typeof bv === 'boolean') {
-        const getBooleanComparison = (): number => {
-          if (av === bv) return 0;
-          return av ? 1 : -1;
-        };
-        return getBooleanComparison() * order;
-      }
-      if (typeof av === 'object' || typeof bv === 'object') {
-        return valueToString(av).localeCompare(valueToString(bv)) * order;
-      }
-      return valueToString(av).localeCompare(valueToString(bv)) * order;
-    };
 
     const field = sortState.field;
     const order = sortState.order === 'desc' ? -1 : 1;
@@ -116,9 +82,18 @@ const Table = <T extends Record<string, unknown>>({
     return [...rows].sort((a, b) => {
       const av = a[field];
       const bv = b[field];
-      return compareValues(av, bv, order);
+
+      if (av === bv) return 0;
+      if (av == null) return -1 * order;
+      if (bv == null) return 1 * order;
+      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * order;
+
+      return String(av).localeCompare(String(bv)) * order;
     });
   }, [rows, sortState]);
+
+  const baseRowClass = `${sizeMap[size]} ${dense ? 'py-1' : ''}`;
+  const headerClasses = `${sizeMap[size]} font-semibold bg-[var(--color-primary-light)] text-[var(--color-black)]`;
 
   const tableVariantClasses = {
     standard: '',
@@ -131,32 +106,23 @@ const Table = <T extends Record<string, unknown>>({
       id={id}
       className={`w-full overflow-x-auto ${className}`}
     >
-      <table 
-        className={`min-w-full text-left border-collapse ${tableVariantClasses[variant]} ${dense ? 'text-sm' : ''}`}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledby}
-        aria-describedby={ariaDescribedby}
-        aria-live={ariaLive}
-      >
+      <table className={`min-w-full text-left border-collapse ${tableVariantClasses[variant]} ${dense ? 'text-sm' : ''}`}>
         <thead className={`${stickyHeader ? 'sticky top-0 z-10' : ''}`}>
           <tr>
-            {columns.filter((c) => !c.hide).map((col) => {
-              const isCurrentSortField = sortState.field === String(col.field);
-              let ariaSort: 'ascending' | 'descending' | undefined;
-              if (isCurrentSortField) {
-                ariaSort = sortState.order === 'asc' ? 'ascending' : 'descending';
-              } else {
-                ariaSort = undefined;
-              }
-
-              return (
+            {columns.filter((c) => !c.hide).map((col) => (
               <th
                 key={col.id ?? String(col.field)}
                 style={{ width: col.width }}
                 className={`px-3 ${headerClasses} ${col.className ?? ''} ${
                   col.align === 'center' ? 'text-center' : ''
                 } ${col.align === 'right' ? 'text-right' : ''}`}
-                aria-sort={ariaSort}
+                aria-sort={
+                  sortState.field === String(col.field)
+                    ? sortState.order === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
               >
                 <div className="flex items-center gap-2">
                   <span>{col.headerName ?? String(col.field)}</span>
@@ -186,30 +152,17 @@ const Table = <T extends Record<string, unknown>>({
                   )}
                 </div>
               </th>
-              );
-            })}
+            ))}
           </tr>
         </thead>
 
         <tbody>
-          {sortedRows.map((row: T, rowIndex: number) => {
-            const rowKey = `row-${Object.values(row).map(val => 
-              typeof val === 'object' && val !== null ? JSON.stringify(val) : String(val)
-            ).join('-')}`;
-            
-            const getStripedClass = (): string => {
-              if (variant !== 'striped') {
-                return '';
-              }
-              return rowIndex % 2 === 0 ? 'bg-white' : 'bg-(--color-primary-light)';
-            };
-            
-            const stripedClass = getStripedClass();
-            
-            return (
+          {sortedRows.map((row: T, rowIndex: number) => (
             <tr
-              key={rowKey}
-              className={`hover:bg-(--color-primary-light) ${stripedClass} cursor-pointer`}
+              key={rowIndex}
+              className={`hover:bg-(--color-primary-light) ${
+                variant === 'striped' ? (rowIndex % 2 === 0 ? 'bg-white' : 'bg-(--color-primary-light)') : ''
+              } cursor-pointer`}
               onClick={() => onRowClick?.(row)}
             >
               {columns
@@ -227,8 +180,7 @@ const Table = <T extends Record<string, unknown>>({
                   </td>
                 ))}
             </tr>
-            );
-          })}
+          ))}
         </tbody>
       </table>
     </div>

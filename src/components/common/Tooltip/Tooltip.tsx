@@ -40,22 +40,22 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   useEffect(() => {
     return () => {
-      if (enterTimer.current) globalThis.clearTimeout(enterTimer.current);
-      if (leaveTimer.current) globalThis.clearTimeout(leaveTimer.current);
+      if (enterTimer.current) window.clearTimeout(enterTimer.current);
+      if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
     };
   }, []);
 
   const show = () => {
-    if (leaveTimer.current) globalThis.clearTimeout(leaveTimer.current);
-    enterTimer.current = globalThis.setTimeout(() => setOpen(true), enterDelay);
+    if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
+    enterTimer.current = window.setTimeout(() => setOpen(true), enterDelay);
   };
 
   const hide = () => {
-    if (enterTimer.current) globalThis.clearTimeout(enterTimer.current);
-    leaveTimer.current = globalThis.setTimeout(() => setOpen(false), leaveDelay);
+    if (enterTimer.current) window.clearTimeout(enterTimer.current);
+    leaveTimer.current = window.setTimeout(() => setOpen(false), leaveDelay);
   };
 
-  const handleTooltipKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       hide();
     }
@@ -77,26 +77,22 @@ const Tooltip: React.FC<TooltipProps> = ({
     right: "left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 rotate-45",
   };
 
-  // Determine aria-describedby for children based on state
-  const childAriaDescribedBy = ariaDescribedby || (open ? tooltipId : undefined);
-
   return (
-    <button
+    <span
       className={`relative inline-flex ${className}`}
       onMouseEnter={show}
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}
-      onKeyDown={handleTooltipKeyDown}
-      aria-label={ariaLabel || "Tooltip trigger"}
-      aria-labelledby={ariaLabelledby}
-      aria-describedby={open ? ariaDescribedby || tooltipId : ariaDescribedby}
-      aria-expanded={open}
-      type="button"
+      onKeyDown={handleKeyDown}
     >
       {React.isValidElement(children)
         ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
-            ...(childAriaDescribedBy ? { "aria-describedby": childAriaDescribedBy } : {}),
+            ...(ariaDescribedby
+              ? { "aria-describedby": ariaDescribedby }
+              : open
+              ? { "aria-describedby": tooltipId }
+              : {}),
             ...(ariaLabel ? { "aria-label": ariaLabel } : {}),
             ...(ariaLabelledby ? { "aria-labelledby": ariaLabelledby } : {}),
           } as Record<string, unknown>)
@@ -134,7 +130,7 @@ const Tooltip: React.FC<TooltipProps> = ({
           />
         </span>
       )}
-    </button>
+    </span>
   );
 };
 

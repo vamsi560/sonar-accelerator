@@ -65,15 +65,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   ...aria
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  
-  // Convert value to initial file array
-  const getInitialFiles = (): File[] => {
-    if (Array.isArray(value)) return value;
-    if (value) return [value];
-    return [];
-  };
-  
-  const [files, setFiles] = useState<File[]>(getInitialFiles());
+  const [files, setFiles] = useState<File[]>(Array.isArray(value) ? value : value ? [value] : []);
   const [isDragActive, setIsDragActive] = useState(false);
 
   const handleClick = () => {
@@ -157,7 +149,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
   }, [files]);
 
   const showError = Boolean(error);
-  const shouldShowClear = !!(files && files.length > 0) || value;
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
@@ -167,14 +158,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
         </label>
       ) : null}
 
-      <fieldset
-        className="flex items-center gap-3 border-0 p-0 m-0"
+      <div
+        className="flex items-center gap-3"
         onDragOver={handleDragOver}
         onDragEnter={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        aria-label={aria['aria-label'] || 'File upload dropzone'}
       >
-        <legend className="sr-only">{aria['aria-label'] || 'File upload dropzone'}</legend>
         <FileUploadInput
           ref={inputRef}
           id={id}
@@ -218,7 +209,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         </div>
 
-        {shouldShowClear ? (
+        {(files && files.length > 0) || value ? (
           <button
             type="button"
             onClick={clearFiles}
@@ -228,7 +219,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             Clear
           </button>
         ) : null}
-      </fieldset>
+      </div>
 
       {helperText ? (
         <div className={`text-xs ${showError ? 'text-[var(--color-error)]' : 'text-gray-500'}`}>{helperText}</div>

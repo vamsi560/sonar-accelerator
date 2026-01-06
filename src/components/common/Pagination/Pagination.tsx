@@ -51,31 +51,18 @@ const Pagination: React.FC<PaginationProps> = ({
     [disabled, onClick]
   );
 
-  const containedClasses = selected
-    ? 'bg-[var(--color-primary)] text-white'
-    : 'bg-white border';
-
-  const outlinedClasses = selected
-    ? 'border-2 border-[var(--color-primary)] text-[var(--color-primary)]'
-    : 'border border-gray-300';
-
-  const textClasses = selected
-    ? 'text-[var(--color-primary)] font-semibold'
-    : 'text-gray-700';
-
-  const getVariantClasses = (): string => {
-    if (variant === 'contained') {
-      return containedClasses;
-    }
-    if (variant === 'outlined') {
-      return outlinedClasses;
-    }
-    return textClasses;
-  };
-
-  const variantClasses = getVariantClasses();
-
-  const ariaCurrent = selected ? 'page' : undefined;
+  const variantClasses =
+    variant === 'contained'
+      ? selected
+        ? 'bg-[var(--color-primary)] text-white'
+        : 'bg-white border'
+      : variant === 'outlined'
+      ? selected
+        ? 'border-2 border-[var(--color-primary)] text-[var(--color-primary)]'
+        : 'border border-gray-300'
+      : selected
+      ? 'text-[var(--color-primary)] font-semibold'
+      : 'text-gray-700';
 
   return (
     <button
@@ -83,7 +70,8 @@ const Pagination: React.FC<PaginationProps> = ({
       onClick={handleClick}
       disabled={disabled}
       className={`rounded-md ${sizeClasses[size]} ${variantClasses} ${className}`}
-      aria-current={ariaCurrent}
+      aria-selected={selected}
+      aria-current={selected ? 'page' : undefined}
       {...aria}
     >
       {value}

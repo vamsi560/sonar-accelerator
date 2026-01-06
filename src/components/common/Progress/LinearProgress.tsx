@@ -92,17 +92,6 @@ const colorMap: Record<string, string> = {
 };
 
 /**
- * Animation map for progress variants
- * Maps variant types to their corresponding animation classes
- */
-const animationMap: Record<string, string> = {
-  indeterminate: 'animate-pulse',
-  buffer: 'animate-pulse',
-  query: 'animate-bounce',
-  determinate: '',
-};
-
-/**
  * Size map for responsive sizing
  * Maps size prop values to height classes for consistent scaling
  */
@@ -150,42 +139,32 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   // Resolve height class from size prop
   const heightClass = sizeMap[size] || 'h-2';
 
-  // Determine animation class based on variant
-  const animationClass = animationMap[variant] || '';
-
   return (
-    <div className={`w-full ${className || ''}`}>
-      {variant === 'determinate' ? (
-        <progress
-          id={id}
-          value={percent}
-          max={100}
-          className={`w-full ${heightClass} ${className || ''}`}
-          style={style}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledby}
-          aria-valuetext={ariaValueText}
-        />
-      ) : (
-        <div
-          id={id}
-          className={`w-full ${heightClass} bg-[var(--color-secondary-light)] rounded overflow-hidden ${className || ''}`}
-          style={style}
-          role="progressbar"
-          aria-valuenow={ariaValueNow}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuetext={ariaValueText}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledby}
-        >
-          {/* Progress bar using color token */}
-          <div
-            className={`${colorMap[color]} ${heightClass} transition-all duration-300 ${animationClass}`}
-            style={{ width: '100%' }}
-          />
-        </div>
-      )}
+    <div
+      id={id}
+      className={`w-full ${heightClass} bg-[var(--color-secondary-light)] rounded overflow-hidden ${className || ''}`}
+      style={style}
+      role="progressbar"
+      aria-valuenow={ariaValueNow ?? (variant === 'determinate' ? percent : undefined)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuetext={ariaValueText}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledby}
+    >
+      {/* Progress bar using color token */}
+      <div
+        className={`${colorMap[color]} ${heightClass} transition-all duration-300 ${
+          variant === 'indeterminate'
+            ? 'animate-pulse'
+            : variant === 'buffer'
+              ? 'animate-pulse'
+              : variant === 'query'
+                ? 'animate-bounce'
+                : ''
+        }`}
+        style={{ width: variant === 'determinate' ? `${percent}%` : '100%' }}
+      />
     </div>
   );
 };

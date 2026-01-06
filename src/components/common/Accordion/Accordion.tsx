@@ -42,7 +42,7 @@ const Accordion: React.FC<AccordionProps> = ({
   const [uncontrolledIsOpen, setUncontrolledIsOpen] = useState(false);
 
   // Support both controlled and uncontrolled modes
-  const isOpen = controlledIsOpen ?? uncontrolledIsOpen;
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : uncontrolledIsOpen;
 
   const handleToggle = () => {
     const newState = !isOpen;

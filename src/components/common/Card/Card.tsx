@@ -12,9 +12,9 @@ export interface CardProps {
   tabIndex?: number;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'elevation' | 'outlined' | 'outlined-raised';
-  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
-  onFocus?: (e: React.FocusEvent<HTMLElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLElement>) => void;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLDivElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLDivElement>) => void;
   tooltip?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -69,34 +69,26 @@ const Card: React.FC<CardProps> = ({
   
   // Determine if card is interactive (has click handler or is focusable)
   const isInteractive = Boolean(onClick || tabIndex !== undefined);
+  
+  // aria-hidden should not be used with interactive elements
+  // Only include aria-hidden if card is NOT interactive and explicitly set
+  const finalAriaHidden = isInteractive ? undefined : ariaHidden;
 
   return (
-    <>
-      {isInteractive ? (
-        <button
-          id={id}
-          className={classes}
-          tabIndex={tabIndex ?? 0}
-          onClick={onClick}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          title={tooltip}
-          {...ariaProps}
-        >
-          {children}
-        </button>
-      ) : (
-        <div
-          id={id}
-          className={classes}
-          title={tooltip}
-          aria-hidden={ariaHidden}
-          {...ariaProps}
-        >
-          {children}
-        </div>
-      )}
-    </>
+    <div
+      id={id}
+      className={classes}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? (tabIndex ?? 0) : undefined}
+      onClick={onClick}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      title={tooltip}
+      aria-hidden={finalAriaHidden}
+      {...ariaProps}
+    >
+      {children}
+    </div>
   );
 };
 

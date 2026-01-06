@@ -84,19 +84,19 @@ export const Snackbar: React.FC<SnackbarProps> = ({
 
   const handleClose = useCallback(() => {
     setIsAnimatingOut(true);
-    globalThis.setTimeout(() => onClose?.(), 200);
+    window.setTimeout(() => onClose?.(), 200);
   }, [onClose]);
 
   // Auto-hide
   useEffect(() => {
     if (!open || isAnimatingOut) return;
     if (autoHideDuration && autoHideDuration > 0) {
-      if (timerRef.current) globalThis.clearTimeout(timerRef.current);
-      timerRef.current = globalThis.setTimeout(handleClose, autoHideDuration);
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+      timerRef.current = window.setTimeout(handleClose, autoHideDuration);
     }
     return () => {
       if (timerRef.current) {
-        globalThis.clearTimeout(timerRef.current);
+        window.clearTimeout(timerRef.current);
         timerRef.current = null;
       }
     };
@@ -107,8 +107,8 @@ export const Snackbar: React.FC<SnackbarProps> = ({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleClose();
     };
-    globalThis.addEventListener("keydown", handleKey);
-    return () => globalThis.removeEventListener("keydown", handleKey);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
   }, [handleClose]);
 
   if (!open && !isAnimatingOut) return null;

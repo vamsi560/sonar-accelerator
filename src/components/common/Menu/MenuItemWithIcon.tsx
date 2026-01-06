@@ -3,7 +3,7 @@ import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 /**
  * MenuItemWithIconProps
  * - A reusable menu item component with icon support
- * - Renders as <button> with flex layout for icon + text
+ * - Renders as <li role="menuitem"> with flex layout for icon + text
  * - Icon can be placed at start or end
  * - Full accessibility support with ARIA attributes
  */
@@ -18,13 +18,14 @@ export interface MenuItemWithIconProps {
   icon?: React.ReactNode;
   iconPosition?: 'start' | 'end';
   badge?: React.ReactNode;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onFocus?: (e: React.FocusEvent<HTMLButtonElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLButtonElement>) => void;
+  onClick?: (e: React.MouseEvent<HTMLLIElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLLIElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLLIElement>) => void;
   'aria-label'?: string;
   'aria-labelledby'?: string;
   'aria-describedby'?: string;
   'aria-disabled'?: boolean;
+  'aria-selected'?: boolean;
   'aria-current'?: 'page' | 'step' | 'location' | 'date' | 'time' | boolean;
   children?: React.ReactNode;
 }
@@ -44,13 +45,13 @@ const iconSizeMap: Record<string, string> = {
 /**
  * MenuItemWithIcon
  * A reusable menu item component with icon support.
- * - Renders as <button> with flex layout
+ * - Renders as <li role="menuitem"> with flex layout
  * - Icon can be placed at start (default) or end
  * - Optional badge for notifications/counts
  * - Token-driven styling with Tailwind
  * - Full accessibility support
  */
-const MenuItemWithIcon = forwardRef<HTMLButtonElement, MenuItemWithIconProps>((props, ref) => {
+const MenuItemWithIcon = forwardRef<HTMLLIElement, MenuItemWithIconProps>((props, ref) => {
   const {
     id,
     className = '',
@@ -69,26 +70,27 @@ const MenuItemWithIcon = forwardRef<HTMLButtonElement, MenuItemWithIconProps>((p
     'aria-labelledby': ariaLabelledby,
     'aria-describedby': ariaDescribedby,
     'aria-disabled': ariaDisabled,
+    'aria-selected': ariaSelected,
     'aria-current': ariaCurrent,
     children,
   } = props;
 
-  const innerRef = useRef<HTMLButtonElement | null>(null);
-  useImperativeHandle<HTMLButtonElement | null, HTMLButtonElement | null>(ref, () => innerRef.current);
+  const innerRef = useRef<HTMLLIElement | null>(null);
+  useImperativeHandle<HTMLLIElement | null, HTMLLIElement | null>(ref, () => innerRef.current);
 
   const sizeClass = sizeMap[size] ?? sizeMap.md;
   const iconSize = iconSizeMap[size] ?? iconSizeMap.md;
   const disabledClass = disabled ? 'opacity-50 cursor-not-allowed pointer-events-none' : 'cursor-pointer';
   const selectedClass = selected ? 'bg-[var(--color-primary-light)] text-[var(--color-primary)]' : '';
-  const hoverClass = disabled ? '' : 'hover:bg-gray-100 transition-colors';
+  const hoverClass = !disabled ? 'hover:bg-gray-100 transition-colors' : '';
   const flexDirection = iconPosition === 'end' ? 'flex-row-reverse' : 'flex-row';
 
   return (
-    <button
+    <li
       ref={innerRef}
       id={id}
-      type="button"
-      disabled={disabled}
+      role="menuitem"
+      tabIndex={disabled ? -1 : 0}
       title={tooltip ?? title}
       onClick={onClick}
       onFocus={onFocus}
@@ -97,6 +99,7 @@ const MenuItemWithIcon = forwardRef<HTMLButtonElement, MenuItemWithIconProps>((p
       aria-labelledby={ariaLabelledby}
       aria-describedby={ariaDescribedby}
       aria-disabled={ariaDisabled ?? disabled}
+      aria-selected={ariaSelected ?? selected}
       aria-current={ariaCurrent}
       className={`flex items-center ${flexDirection} ${sizeClass} ${disabledClass} ${selectedClass} ${hoverClass} rounded text-[var(--color-black)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] ${className}`}
     >
@@ -111,7 +114,7 @@ const MenuItemWithIcon = forwardRef<HTMLButtonElement, MenuItemWithIconProps>((p
           {badge}
         </span>
       )}
-    </button>
+    </li>
   );
 });
 

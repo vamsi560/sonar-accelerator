@@ -58,18 +58,12 @@ const Link: React.FC<LinkProps> = ({
     fontSize: `var(--font-size-${size})`,
   };
 
-  // Determine text decoration based on underline prop
-  const getUnderlineStyle = (): React.CSSProperties => {
-    if (underline === "always") {
-      return { textDecoration: "underline" };
-    }
-    if (underline === "hover") {
-      return { textDecoration: "underline" };
-    }
-    return { textDecoration: "none" };
-  };
-
-  const underlineStyle = getUnderlineStyle();
+  const underlineStyle =
+    underline === "always"
+      ? { textDecoration: "underline" }
+      : underline === "hover"
+      ? { textDecoration: "underline" }
+      : { textDecoration: "none" };
 
   return (
     <NavLink
