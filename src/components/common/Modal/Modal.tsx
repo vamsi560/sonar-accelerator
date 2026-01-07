@@ -33,7 +33,6 @@ export interface ModalProps {
   className?: string;
   title?: React.ReactNode;
   slots?: Record<string, React.ReactNode>;
-  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   /** max width of the modal content (CSS value, e.g. '600px' or '90vw') */
   maxWidth?: string;
   /** max height of the modal content (CSS value, e.g. '80vh') */
@@ -67,7 +66,6 @@ const Modal: React.FC<ModalProps> = ({
   className = '',
   title,
   slots,
-  onClick,
   maxWidth,
   maxHeight,
   'aria-label': ariaLabel,
@@ -77,7 +75,7 @@ const Modal: React.FC<ModalProps> = ({
   'aria-modal': ariaModal,
   'aria-live': ariaLive,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -85,8 +83,8 @@ const Modal: React.FC<ModalProps> = ({
         onClose?.(undefined);
       }
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    globalThis.addEventListener('keydown', onKey);
+    return () => globalThis.removeEventListener('keydown', onKey);
   }, [isOpen, disableEscapeKeyDown, onClose]);
 
   // Focus the dialog container when opened for accessibility.
@@ -98,63 +96,67 @@ const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
+  const backdropClassName = "absolute inset-0 bg-[var(--color-backdrop)] " + (BackdropProps?.className ?? '');
+  const dialogClassName = "relative z-10 w-full max-w-lg p-[var(--padding-medium)] bg-[var(--color-white)] shadow-lg outline-none " + className;
+
+  const handleDialogKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
+    if (e.key === 'Escape' && !disableEscapeKeyDown) {
+      onClose?.(undefined);
+    }
+  };
+
   return (
-    <div id={id} className={`fixed inset-0 z-50 flex items-center justify-center`} role="presentation">
+    <div id={id} className={`fixed inset-0 z-50 flex items-center justify-center`}>
       {!hideBackdrop && (
-        <div
-          aria-hidden="true"
+        <button
+          type="button"
+          aria-label="close modal"
           onClick={() => onClose?.(undefined)}
-          className={"absolute inset-0 bg-[var(--color-backdrop)] " + (BackdropProps?.className ?? '')}
+          className={backdropClassName}
         />
       )}
-     <div
-  ref={containerRef}
-  tabIndex={-1}
-  role="dialog"
-  aria-label={ariaLabel}
-  aria-labelledby={ariaLabelledby}
-  aria-describedby={ariaDescribedby}
-  aria-controls={ariaControls}
-  aria-modal={ariaModal}
-  aria-live={ariaLive}
-  onClick={onClick}
-  className={
-    "relative z-10 w-full max-w-lg p-[var(--padding-medium)] bg-[var(--color-white)] shadow-lg outline-none " +
-    className
-  }
-  data-max-width={maxWidth}
-  data-max-height={maxHeight}
->
-  {/* Header */}
-  {slots?.header ?? (title ? <div className="mb-[var(--gap-small)] font-medium">{title}</div> : null)}
+      <dialog
+        ref={containerRef}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledby}
+        aria-describedby={ariaDescribedby}
+        aria-controls={ariaControls}
+        aria-modal={ariaModal}
+        aria-live={ariaLive}
+        tabIndex={-1}
+        onKeyDown={handleDialogKeyDown}
+        className={dialogClassName}
+        data-max-width={maxWidth}
+        data-max-height={maxHeight}
+      >
+        {/* Header */}
+        {slots?.header ?? (title ? <div className="mb-[var(--gap-small)] font-medium">{title}</div> : null)}
 
-  {/* Body (scrollable) */}
-<div
-    className="overflow-y-auto"
-    style={{ maxHeight: maxHeight ?? "80vh" }}
-  >
-    {children}
-  </div>
+        {/* Body (scrollable) */}
+        <div
+          className="overflow-y-auto"
+          style={{ maxHeight: maxHeight ?? "80vh" }}
+        >
+          {children}
+        </div>
 
+        {/* Footer */}
+        {slots?.footer}
 
-  {/* Footer */}
-  {slots?.footer}
+        {slots?.actions}
 
-  {slots?.actions}
-
-  {/* Close button */}
-  {onClose && (
-    <button
-      type="button"
-      aria-label="close"
-      onClick={() => onClose?.(undefined)}
-      className="absolute top-2 right-2 text-[var(--color-text-secondary)]"
-    >
-      ×
-    </button>
-  )}
-</div>
-
+        {/* Close button */}
+        {onClose && (
+          <button
+            type="button"
+            aria-label="close"
+            onClick={() => onClose?.(undefined)}
+            className="absolute top-2 right-2 text-[var(--color-text-secondary)]"
+          >
+            ×
+          </button>
+        )}
+      </dialog>
     </div>
   );
 };

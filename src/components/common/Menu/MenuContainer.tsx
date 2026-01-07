@@ -3,7 +3,7 @@ import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 /**
  * MenuContainerProps
  * - Container/wrapper for menu items with list semantics and accessibility
- * - Renders as <ul role="menu">
+ * - Renders as <ul> with implicit list role
  * - Supports vertical/horizontal orientation
  */
 export interface MenuContainerProps {
@@ -21,7 +21,7 @@ export interface MenuContainerProps {
 /**
  * MenuContainer
  * A reusable menu container component with accessibility support.
- * - Renders as <ul role="menu"> for semantic menu structure
+ * - Renders as <ul> with implicit list role for semantic menu structure
  * - Supports vertical (default) and horizontal orientation
  * - Token-driven styling with Tailwind
  * - Provides proper ARIA attributes for screen readers
@@ -48,7 +48,6 @@ const MenuContainer = forwardRef<HTMLUListElement, MenuContainerProps>((props, r
     <ul
       ref={innerRef}
       id={id}
-      role="menu"
       className={`list-none p-0 m-0 flex ${flexDirection} gap-[var(--gap-xsmall)] bg-[var(--color-white)] rounded border border-[var(--color-divider)] ${className}`}
       title={tooltip}
       aria-label={ariaLabel}

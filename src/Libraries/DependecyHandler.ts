@@ -5,8 +5,8 @@
  * @returns True if the element should be rendered, false otherwise.
  */
 export const checkRenderCondition = (
-    element: { hideWhenDepNotMet?: boolean; dependsOn?: any[] },
-    values: Record<string, any>
+    element: { hideWhenDepNotMet?: boolean; dependsOn?: unknown[] },
+    values: Record<string, unknown>
 ): boolean => {
     const { hideWhenDepNotMet, dependsOn } = element;
     if (hideWhenDepNotMet && dependsOn) {
@@ -21,7 +21,7 @@ export const checkRenderCondition = (
  * @param values - The current values of all fields.
  * @returns True if all dependencies are valid, false otherwise.
  */
-const checkConditions = (dependsOn: any[], values: Record<string, any>): boolean => {
+const checkConditions = (dependsOn: unknown[], values: Record<string, unknown>): boolean => {
     for (const dep of dependsOn) {
         const isValid = checkDependency(dep, values);
         if (!isValid) {
@@ -37,22 +37,27 @@ const checkConditions = (dependsOn: any[], values: Record<string, any>): boolean
  * @param values - The current values of all fields.
  * @returns True if the dependency is met, false otherwise.
  */
-const checkDependency = (dep: any, values: Record<string, any>): boolean => {
+const checkDependency = (dep: unknown, values: Record<string, unknown>): boolean => {
+    const depObj = dep as { operator?: string; dependsOn?: unknown[]; elementId?: string; equals?: unknown; in?: unknown[]; exists?: boolean };
     let val = '';
-    if (dep.operator === 'or') {
-        return checkOrConditions(dep.dependsOn, values);
-    } else {
-        if (dep.elementId in values) {
-            val = values[dep.elementId];
-        }
-        if (dep.equals && val !== dep.equals) {
-            return false;
-        } else if (dep.in && !dep.in.includes(val)) {
-            return false;
-        } else if (dep.exists && !val) {
-            return false;
-        }
+    if (depObj.operator === 'or') {
+        return checkOrConditions(depObj.dependsOn, values);
     }
+    
+    if (depObj.elementId && depObj.elementId in values) {
+        val = String(values[depObj.elementId]);
+    }
+    
+    if (depObj.equals && val !== depObj.equals) {
+        return false;
+    }
+    if (depObj.in && !depObj.in.includes(val)) {
+        return false;
+    }
+    if (depObj.exists && !val) {
+        return false;
+    }
+    
     return true;
 };
 
@@ -62,7 +67,8 @@ const checkDependency = (dep: any, values: Record<string, any>): boolean => {
  * @param values - The current values of all fields.
  * @returns True if any dependency is valid, false otherwise.
  */
-const checkOrConditions = (dependsOn: any[], values: Record<string, any>): boolean => {
+const checkOrConditions = (dependsOn: unknown[] | undefined, values: Record<string, unknown>): boolean => {
+    if (!dependsOn) return false;
     for (const dep of dependsOn) {
         const valid = checkDependency(dep, values);
         if (valid) {

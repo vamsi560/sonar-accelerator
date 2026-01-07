@@ -395,6 +395,41 @@ const Stepper: React.FC<StepperProps> = ({
     };
   };
 
+  /**
+   * Get the button class string for a step
+   */
+  const getStepButtonClass = (isActive: boolean, isCompleted: boolean, isDisabled: boolean | undefined): string => {
+    const baseClass = `flex items-center justify-center rounded-full border-2 transition-all duration-300 ${sizeMap[size].button} font-semibold`;
+    
+    const activeStatusClass = `${bgColorMap[color]} text-white border-transparent`;
+    const completedStatusClass = `bg-[var(--color-success)] text-white border-[var(--color-success)]`;
+    const defaultStatusClass = `bg-white border-[var(--color-secondary-light)] ${colorMap[color]}`;
+    
+    const getStatusClass = (): string => {
+      if (isActive) {
+        return activeStatusClass;
+      }
+      if (isCompleted) {
+        return completedStatusClass;
+      }
+      return defaultStatusClass;
+    };
+
+    const statusClass = getStatusClass();
+    
+    const interactionClass = isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md';
+    return `${baseClass} ${statusClass} ${interactionClass} ${sizeMap[size].icon}`;
+  };
+
+  /**
+   * Get the step indicator content (icon, checkmark, or number)
+   */
+  const getStepIndicatorContent = (stepData: StepperStep, stepIndex: number, isCompleted: boolean): React.ReactNode => {
+    if (stepData.icon) return stepData.icon;
+    if (isCompleted) return <span className="text-lg">✓</span>;
+    return <span>{stepIndex + 1}</span>;
+  };
+
   const stepperContent = (
     <div
       id={id}
@@ -417,10 +452,13 @@ const Stepper: React.FC<StepperProps> = ({
         const isDisabled = disabled || stepData.disabled;
         const canNavigate =
           type === 'non-linear' || stepIndex <= currentStep || (isCompleted && stepIndex === currentStep + 1);
+        const stepKey = `step-${typeof stepData.label === 'string' ? stepData.label.toLowerCase().replaceAll(/\s+/g, '-') : stepIndex}`;
+        const stepLabel = typeof stepData.label === 'string' ? stepData.label : `Step ${stepIndex + 1}`;
+        const stepAriaLabel = ariaLabel || stepLabel;
 
         return (
           <div
-            key={stepIndex}
+            key={stepKey}
             className={`flex items-center ${
               orientation === 'vertical' ? 'mb-4' : 'relative'
             } ${alternativeLabel && orientation === 'horizontal' ? 'flex-col' : ''}`}
@@ -428,20 +466,8 @@ const Stepper: React.FC<StepperProps> = ({
             {/* Step indicator button */}
             <button
               type="button"
-              className={`flex items-center justify-center rounded-full border-2 transition-all duration-300 ${
-                sizeMap[size].button
-              } font-semibold ${
-                isActive
-                  ? `${bgColorMap[color]} text-white border-transparent`
-                  : isCompleted
-                    ? `bg-[var(--color-success)] text-white border-[var(--color-success)]`
-                    : `bg-white border-[var(--color-secondary-light)] ${colorMap[color]}`
-              } ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-md'} ${
-                sizeMap[size].icon
-              }`}
-              aria-label={
-                ariaLabel || `${typeof stepData.label === 'string' ? stepData.label : `Step ${stepIndex + 1}`}`
-              }
+              className={getStepButtonClass(isActive, isCompleted, isDisabled)}
+              aria-label={stepAriaLabel}
               onClick={() => handleStepClick(stepIndex)}
               onKeyDown={(e) => handleKeyDown(e, stepIndex)}
               onFocus={() => handleStepFocus(stepIndex)}
@@ -450,13 +476,7 @@ const Stepper: React.FC<StepperProps> = ({
               tabIndex={isActive ? 0 : -1}
               {...getCurrentStepAriaProps(stepIndex)}
             >
-              {stepData.icon ? (
-                stepData.icon
-              ) : isCompleted ? (
-                <span className="text-lg">✓</span>
-              ) : (
-                <span>{stepIndex + 1}</span>
-              )}
+              {getStepIndicatorContent(stepData, stepIndex, isCompleted)}
             </button>
 
             {/* Step label and description */}

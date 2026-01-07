@@ -432,9 +432,9 @@ const Home = () => {
             </Card>
             <Card variant="outlined" size="md">
               <Menu variant="danger">
-                <button className="w-full text-left px-4 py-2 hover:bg-red-100 text-red-600">Delete</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-red-100 text-red-600">Remove</button>
-                <button className="w-full text-left px-4 py-2 hover:bg-red-100 text-red-600">Discard</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-800">Delete</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-800">Remove</button>
+                <button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-800">Discard</button>
               </Menu>
             </Card>
           </div>

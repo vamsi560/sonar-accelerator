@@ -20,7 +20,7 @@ const defaultConfig: StorageManagerConfig = {
 
 export function setKeyValue(
     key: string,
-    value: any,
+    value: unknown,
     config: StorageManagerConfig = defaultConfig,
     expiration?: number
 ): void {
@@ -35,19 +35,19 @@ export function setKeyValue(
     }
 }
 
-export function setSessionStorage(key: string, value: any): void {
+export function setSessionStorage(key: string, value: unknown): void {
     const serializedValue = JSON.stringify(value);
     sessionStorage.setItem(key, serializedValue);
     console.log(`Data with key "${key}" saved to session storage.`);
 }
 
-export function setLocalStorage(key: string, value: any): void {
+export function setLocalStorage(key: string, value: unknown): void {
     const serializedValue = JSON.stringify(value);
     localStorage.setItem(key, serializedValue);
     console.log(`Data with key "${key}" saved to local storage.`);
 }
 
-export function setCookie(key: string, value: any, expirationMinutes?: number): void {
+export function setCookie(key: string, value: unknown, expirationMinutes?: number): void {
     const expirationDate = new Date();
     expirationDate.setTime(expirationDate.getTime() + ((expirationMinutes || 0) * 60 * 1000));
     const cookieString = `${key}=${encodeURIComponent(JSON.stringify(value))}; expires=${expirationDate.toUTCString()}; path=/`;
@@ -55,27 +55,24 @@ export function setCookie(key: string, value: any, expirationMinutes?: number): 
     console.log(`Data with key "${key}" saved to cookies.`);
 }
 
-export function getSessionStorage<T = any>(key: string): T | null {
+export function getSessionStorage<T = unknown>(key: string): T | null {
     const serializedValue = sessionStorage.getItem(key);
     return serializedValue ? JSON.parse(serializedValue) : null;
 }
 
-export function getLocalStorage<T = any>(key: string): T | null {
+export function getLocalStorage<T = unknown>(key: string): T | null {
     const serializedValue = localStorage.getItem(key);
     return serializedValue ? JSON.parse(serializedValue) : null;
 }
 
-export function getCookie<T = any>(key: string): T | null {
+export function getCookie<T = unknown>(key: string): T | null {
     const name = `${key}=`;
     const decodedCookie = decodeURIComponent(document.cookie);
     const cookieArray = decodedCookie.split(';');
-    for (let i = 0; i < cookieArray.length; i++) {
-        let cookie = cookieArray[i];
-        while (cookie.charAt(0) === ' ') {
-            cookie = cookie.substring(1);
-        }
-        if (cookie.indexOf(name) === 0) {
-            const value = cookie.substring(name.length, cookie.length);
+    for (const cookieItem of cookieArray) {
+        const cookie = cookieItem.trim();
+        if (cookie.startsWith(name)) {
+            const value = cookie.substring(name.length);
             return JSON.parse(decodeURIComponent(value));
         }
     }
@@ -83,11 +80,11 @@ export function getCookie<T = any>(key: string): T | null {
 }
 
 export function clearSessionStorage(key?: string): void {
-    if (!key) {
-        sessionStorage.clear();
-    } else {
+    if (key) {
         sessionStorage.removeItem(key);
         console.log(`Data with key "${key}" cleared from session storage.`);
+    } else {
+        sessionStorage.clear();
     }
 }
 

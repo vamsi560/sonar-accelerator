@@ -87,6 +87,17 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>((props, ref) => {
   const errorClass = error ? 'ring-1 ring-[var(--color-error)]' : '';
   const disabledClass = disabled ? 'opacity-50 cursor-not-allowed' : 'opacity-100';
 
+  // Determine which value prop to use (controlled vs uncontrolled)
+  const getSelectProps = () => {
+    if (value !== undefined) {
+      return { value };
+    }
+    if (defaultValue !== undefined) {
+      return { defaultValue };
+    }
+    return {};
+  };
+
   return (
     <div className={`flex flex-col ${className}`}>
       {label && (
@@ -99,8 +110,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>((props, ref) => {
         ref={innerRef}
         id={id}
         name={name}
-        {...(value !== undefined ? { value } : {})}
-        {...(value === undefined && defaultValue !== undefined ? { defaultValue } : {})}
+        {...getSelectProps()}
         required={required}
         disabled={disabled}
         title={title}

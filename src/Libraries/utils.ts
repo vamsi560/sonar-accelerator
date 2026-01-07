@@ -5,7 +5,7 @@
  * @returns The URL with parameters replaced.
  */
 export const replaceRouteParams = (urlTemplate: string, params: Record<string, string>): string => {
-    return urlTemplate.replace(/:([a-zA-Z]+)/g, (_, key) => {
+    return urlTemplate.replaceAll(/:([a-zA-Z]+)/g, (_, key) => {
         return params[key] || `:${key}`;
     });
 };
@@ -15,9 +15,9 @@ export const replaceRouteParams = (urlTemplate: string, params: Record<string, s
  * @param fields - Array of objects with 'name' and 'value' properties.
  * @returns Object mapping field names to their values.
  */
-export const getKeyValuePairs = (fields: Array<{ name: string; value: any }>): Record<string, any> => {
-    const obj: Record<string, any> = {};
-    fields.map(field => {
+export const getKeyValuePairs = (fields: Array<{ name: string; value: unknown }>): Record<string, unknown> => {
+    const obj: Record<string, unknown> = {};
+    fields.forEach(field => {
         Object.assign(obj, { [field.name]: field.value });
     });
     return obj;
@@ -30,13 +30,14 @@ export const getKeyValuePairs = (fields: Array<{ name: string; value: any }>): R
  * @returns Array of visible field objects.
  */
 export const getVisibleFields = (
-    fields: Array<any>,
-    formData: Record<string, any>
-): Array<any> => {
+    fields: Array<unknown>,
+    formData: Record<string, unknown>
+): Array<unknown> => {
     return fields.filter((field) => {
-        if (field.dependencies) {
-            const dependentValue = formData[field.dependencies.dependentOn];
-            if (field.dependencies.dependent && dependentValue !== field.dependencies.dependent) {
+        if (typeof field === 'object' && field !== null && 'dependencies' in field) {
+            const fieldObj = field as { dependencies: { dependentOn: string; dependent: unknown } };
+            const dependentValue = formData[fieldObj.dependencies.dependentOn];
+            if (fieldObj.dependencies.dependent && dependentValue !== fieldObj.dependencies.dependent) {
                 return false;
             }
         }
@@ -49,8 +50,8 @@ export const getVisibleFields = (
  * @param fieldsArray - Array of objects with 'name' and 'value' properties.
  * @returns Object mapping field names to their values.
  */
-export const mapFormData = (fieldsArray: Array<{ name: string; value: any }>): Record<string, any> => {
-    const dataObj: Record<string, any> = {};
+export const mapFormData = (fieldsArray: Array<{ name: string; value: unknown }>): Record<string, unknown> => {
+    const dataObj: Record<string, unknown> = {};
     fieldsArray.forEach(field => {
         dataObj[field.name] = field.value;
     });
@@ -63,6 +64,6 @@ export const mapFormData = (fieldsArray: Array<{ name: string; value: any }>): R
  * @returns The transformed, human-readable string.
  */
 export const transformKey = (key: string): string => {
-    return key.replace(/([A-Z])/g, ' $1')
+    return key.replaceAll(/([A-Z])/g, ' $1')
         .replace(/^./, str => str.toUpperCase());
 };
