@@ -1,0 +1,42 @@
+ :root {
+  --color-primary: #1976d2;
+  --color-primary-dark: #1565c0;
+  --color-primary-light: #e3f2fd;
+  --color-secondary: #9c27b0;
+  --color-secondary-dark: #7b1fa2;
+  --color-secondary-light: #f3e5f5;
+  --color-success: #2e7d32;
+  --color-success-dark: #1b5e20;
+  --color-success-light: #e8f5e9;
+  --color-error: #d32f2f;
+  --color-error-dark: #b71c1c;
+  --color-error-light: #ffebee;
+  --color-info: #0288d1;
+  --color-info-dark: #01579b;
+  --color-info-light: #e1f5fe;
+  --color-warning: #ed6c02;
+  --color-warning-dark: #e65100;
+  --color-warning-light: #fff3e0;
+  --color-inherit: inherit;
+  --color-white: #fff;
+  --color-black: #000;
+  --padding-small: 6px 12px;
+  --padding-medium: 8px 16px;
+  --padding-large: 10px 24px;
+  --font-size-small: 14px;
+  --font-size-medium: 16px;
+  --font-size-large: 18px;
+  --gap-small: 8px;
+  --gap-xsmall: 4px;
+  --min-height-small: 32px;
+  --nested-indent: 2rem;
+  --radius-full: 999px;
+  --badge-padding: 0 0.4rem;
+  --line-height-small: 1.6;
+  --min-height-medium: 36px;
+  --min-height-large: 42px;
+  --color-divider: rgba(0,0,0,0.08);
+  --color-text-secondary: rgba(0,0,0,0.6);
+  /* Backdrop color token used for modal/backdrop overlays */
+  --color-backdrop: rgba(0,0,0,0.5);
+}
